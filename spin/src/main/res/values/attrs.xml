@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SpinView">
+        <attr name="lines" format="integer"/><!-- number of lines to draw -->
+        <attr name="length" format="dimension"/><!-- length of each line -->
+        <attr name="width" format="dimension"/><!-- line thickness -->
+        <attr name="radius" format="dimension"/><!-- radius of the inner circle -->
+        <attr name="scale" format="float"/><!-- scales overall size of the spinner -->
+        <attr name="corners" format="float"/><!-- Corner roundness (0..1) -->
+        <attr name="ccolor" format="color"/><!-- color of the spinner -->
+        <attr name="fadeColor" format="color"/><!-- color the spinner fades to -->
+        <attr name="opacity" format="float"/><!-- minimum opacity of the lines -->
+        <attr name="rotate" format="integer"/><!-- the rotation offset -->
+        <attr name="direction" format="enum">
+            <enum name="clockwise" value="1" />
+            <enum name="counterclockwise" value="-1" />
+        </attr>
+        <attr name="speed" format="float"/><!-- rounds per second -->
+        <attr name="trail" format="integer"/><!-- afterglow percentage -->
+    </declare-styleable>
+</resources>
