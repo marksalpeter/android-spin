@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -53,6 +55,8 @@ public class SpinView extends View {
     private Paint mColorPaint;
     private Paint mFadeColorPaint;
     private int mFrame;
+    private HandlerThread mAnimationHandlerThread;
+    private Handler mAnimationHandler;
 
 
     public SpinView(Context context) {
@@ -94,21 +98,26 @@ public class SpinView extends View {
         mColorPaint.setColor(mColor);
         mFadeColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mFadeColorPaint.setColor(mFadeColor);
+
+        // create the animation handler thread
+        mAnimationHandlerThread = new HandlerThread(TAG);
+        mAnimationHandlerThread.start();
+        mAnimationHandler = new Handler(mAnimationHandlerThread.getLooper());
     }
 
     @Override public void onAttachedToWindow() {
         super.onAttachedToWindow();
         // start the animation
-        post(new Runnable() {
+        mAnimationHandler.post(new Runnable() {
             @Override public void run() {
-                // stop the animation
-                if (!isAttachedToWindow()) {
-                    Log.d(TAG, "FUCK");
-                    return;
-                }
-                mFrame = (mFrame + 1) % Integer.MAX_VALUE;
-                invalidate();
-                postDelayed(this, 1000/sFPS);
+            // stop the animation
+            if (!isAttachedToWindow()) {
+                mAnimationHandlerThread.quitSafely();
+                return;
+            }
+            mFrame = (mFrame + 1) % Integer.MAX_VALUE;
+            invalidate();
+            mAnimationHandler.postDelayed(this, 1000/sFPS);
             }
         });
     }
