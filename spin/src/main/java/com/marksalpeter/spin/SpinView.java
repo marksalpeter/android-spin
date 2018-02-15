@@ -18,7 +18,7 @@ import android.view.View;
 
 /**
  * SpinView is a port of Spin.js to a native android view
- * TODO: document your custom view class.
+ * Created by Mark Salpeter
  */
 public class SpinView extends View {
 
@@ -116,7 +116,7 @@ public class SpinView extends View {
                 return;
             }
             mFrame = (mFrame + 1) % Integer.MAX_VALUE;
-            invalidate();
+            postInvalidate();
             mAnimationHandler.postDelayed(this, 1000/sFPS);
             }
         });
@@ -148,7 +148,6 @@ public class SpinView extends View {
                 );
             }
             // draw the main color over top
-            if (i == 0) Log.d(TAG, "onDraw: " + mFrame + " / " + sFPS + " * " + mSpeed  + " = " + (((float)mFrame / sFPS) * mSpeed));
             mColorPaint.setAlpha(getLineOpacity(i, (((float)mFrame / sFPS) * mSpeed) % 1));
             canvas.drawRoundRect(
                     mRadius * mScale,
