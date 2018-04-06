@@ -121,7 +121,7 @@ public class SpinView extends View {
         mAnimationHandler.post(new Runnable() {
             @Override public void run() {
             // stop the animation
-            if (ViewCompat.isAttachedToWindow(SpinView.this)) {
+            if (!ViewCompat.isAttachedToWindow(SpinView.this)) {
                 try {
                     mAnimationHandlerThread.quit();
                 } catch (Exception e) {
