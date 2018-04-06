@@ -5,10 +5,12 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -57,6 +59,7 @@ public class SpinView extends View {
     private int mFrame;
     private HandlerThread mAnimationHandlerThread;
     private Handler mAnimationHandler;
+    private RectF mBounds;
 
 
     public SpinView(Context context) {
@@ -103,6 +106,13 @@ public class SpinView extends View {
         mAnimationHandlerThread = new HandlerThread(TAG);
         mAnimationHandlerThread.start();
         mAnimationHandler = new Handler(mAnimationHandlerThread.getLooper());
+
+        mBounds = new RectF(
+            mRadius * mScale,
+            (-mWidth/2) * mScale,
+            (mRadius + mLength) * mScale,
+            (mWidth/2) * mScale
+        );
     }
 
     @Override public void onAttachedToWindow() {
@@ -111,8 +121,12 @@ public class SpinView extends View {
         mAnimationHandler.post(new Runnable() {
             @Override public void run() {
             // stop the animation
-            if (!isAttachedToWindow()) {
-                mAnimationHandlerThread.quitSafely();
+            if (ViewCompat.isAttachedToWindow(SpinView.this)) {
+                try {
+                    mAnimationHandlerThread.quit();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
                 return;
             }
             mFrame = (mFrame + 1) % Integer.MAX_VALUE;
@@ -135,13 +149,11 @@ public class SpinView extends View {
             canvas.save();
             canvas.translate(getWidth() / 2, getHeight() / 2);
             canvas.rotate((float)Math.floor(360 / mLines * i + mRotate));
+
             // draw the fade color
             if (Color.alpha(mFadeColor) > 0) {
                 canvas.drawRoundRect(
-                    mRadius * mScale,
-                    (-mWidth/2) * mScale,
-                    (mRadius + mLength) * mScale,
-                    (mWidth/2) * mScale,
+                    mBounds,
                     mCorners * mWidth * mScale,
                     mCorners * mWidth * mScale,
                     mFadeColorPaint
@@ -150,10 +162,7 @@ public class SpinView extends View {
             // draw the main color over top
             mColorPaint.setAlpha(getLineOpacity(i, (((float)mFrame / sFPS) * mSpeed) % 1));
             canvas.drawRoundRect(
-                    mRadius * mScale,
-                    (-mWidth/2) * mScale,
-                    (mRadius + mLength) * mScale,
-                    (mWidth/2) * mScale,
+                    mBounds,
                     mCorners * mWidth * mScale,
                     mCorners * mWidth * mScale,
                     mColorPaint
